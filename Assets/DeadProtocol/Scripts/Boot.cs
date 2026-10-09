@@ -8,9 +8,9 @@ namespace DeadProtocol
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init()
         {
-            if (GameObject.Find("DeadProtocol_Escena") != null) return;
-            GameObject g = new GameObject("DeadProtocol_Escena");
-            g.AddComponent<SceneController>();
+            if (GameObject.Find("DeadProtocol_Juego") != null) return;
+            GameObject g = new GameObject("DeadProtocol_Juego");
+            g.AddComponent<GameController>();
         }
     }
 }

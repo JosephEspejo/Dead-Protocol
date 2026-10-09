@@ -311,6 +311,104 @@ namespace DeadProtocol
 #endif
         }
 
+        public static Vector2 Pointer()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+#else
+            return Input.mousePosition;
+#endif
+        }
+
+        public static bool ClickHeld()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Mouse.current != null && Mouse.current.leftButton.isPressed;
+#else
+            return Input.GetMouseButton(0);
+#endif
+        }
+
+        public static bool RightHeld()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Mouse.current != null && Mouse.current.rightButton.isPressed;
+#else
+            return Input.GetMouseButton(1);
+#endif
+        }
+
+        public static float Wheel()
+        {
+#if ENABLE_INPUT_SYSTEM
+            float y = Mouse.current != null ? Mouse.current.scroll.ReadValue().y : 0f;
+            return Mathf.Abs(y) > 0.01f ? Mathf.Sign(y) : 0f;
+#else
+            return Input.mouseScrollDelta.y;
+#endif
+        }
+
+        public static bool Reload()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
+#else
+            return Input.GetKeyDown(KeyCode.R);
+#endif
+        }
+
+        public static bool EnterKey()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Keyboard.current != null && (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame);
+#else
+            return Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
+#endif
+        }
+
+        public static int ArrowKey()
+        {
+#if ENABLE_INPUT_SYSTEM
+            Keyboard k = Keyboard.current;
+            if (k == null) return 0;
+            if (k.leftArrowKey.wasPressedThisFrame || k.aKey.wasPressedThisFrame) return -1;
+            if (k.rightArrowKey.wasPressedThisFrame || k.dKey.wasPressedThisFrame) return 1;
+            return 0;
+#else
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) return -1;
+            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) return 1;
+            return 0;
+#endif
+        }
+
+        // Material plano sin iluminacion (barras de vida)
+        public static Material Flat(Color c)
+        {
+            Shader s = Shader.Find("Sprites/Default");
+            Material m = s != null ? new Material(s) : Mat(c);
+            m.color = c;
+            return m;
+        }
+
+        // Vineta roja para el efecto de dano
+        public static Texture2D Vignette()
+        {
+            int n = 128;
+            Texture2D t = new Texture2D(n, n, TextureFormat.RGBA32, false);
+            Color[] px = new Color[n * n];
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < n; x++)
+                {
+                    float dx = (x - n / 2f) / (n / 2f), dy = (y - n / 2f) / (n / 2f);
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    px[y * n + x] = new Color(0.8f, 0f, 0f, Mathf.SmoothStep(0.35f, 1.15f, d));
+                }
+            t.SetPixels(px);
+            t.wrapMode = TextureWrapMode.Clamp;
+            t.Apply();
+            return t;
+        }
+
         public static bool EscKey()
         {
 #if ENABLE_INPUT_SYSTEM
